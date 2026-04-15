@@ -5,272 +5,126 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aria — Student Intake</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
-  --ink: #1A1814;
-  --ink-soft: #4A4540;
-  --ink-muted: #8A8480;
-  --paper: #FDFAF6;
-  --paper-warm: #F5F0E8;
-  --paper-mid: #EDE8E0;
-  --line: #DDD8CE;
-  --sage: #4A6B5A;
-  --sage-light: #E8EFE9;
-  --sage-dark: #324A3E;
-  --amber: #C4813B;
-  --amber-light: #FDF3E8;
-  --blue: #3D5F8A;
-  --blue-light: #EBF0F7;
-  --rose: #8A4A5A;
-  --rose-light: #F5EBEE;
-  --gold: #7A6430;
-  --gold-light: #F5F0E0;
-  --shadow-xs: 0 1px 2px rgba(26,24,20,0.05);
+  --ink: #1A1814; --ink-soft: #4A4540; --ink-muted: #8A8480;
+  --paper: #FDFAF6; --paper-warm: #F5F0E8; --paper-mid: #EDE8E0; --line: #DDD8CE;
+  --sage: #4A6B5A; --sage-light: #E8EFE9; --sage-dark: #324A3E;
+  --amber: #C4813B; --amber-light: #FDF3E8;
+  --blue: #3D5F8A; --blue-light: #EBF0F7;
+  --rose: #8A4A5A; --rose-light: #F5EBEE;
+  --gold: #7A6430; --gold-light: #F5F0E0;
   --shadow-sm: 0 2px 8px rgba(26,24,20,0.07);
   --shadow-md: 0 4px 20px rgba(26,24,20,0.09);
   --shadow-lg: 0 8px 40px rgba(26,24,20,0.12);
-  --r: 10px;
-  --r-lg: 16px;
+  --r: 10px; --r-lg: 16px;
 }
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--paper);
-  color: var(--ink);
-  min-height: 100vh;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-}
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 0;
-}
-.topbar {
-  position: sticky; top: 0; z-index: 100;
-  background: rgba(253,250,246,0.92);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--line);
-  padding: 0 32px;
-}
-.topbar-inner {
-  max-width: 860px; margin: 0 auto;
-  display: flex; align-items: center; justify-content: space-between;
-  height: 60px;
-}
-.wordmark {
-  font-family: 'Instrument Serif', serif;
-  font-size: 22px; color: var(--sage-dark);
-  letter-spacing: -0.02em;
-  display: flex; align-items: center; gap: 8px;
-}
-.wordmark-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--sage); display: inline-block;
-  margin-bottom: 2px;
-}
-.topbar-meta {
-  font-size: 12px; color: var(--ink-muted);
-  font-weight: 500; letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-.main {
-  max-width: 860px; margin: 0 auto;
-  padding: 48px 32px 80px;
-  position: relative; z-index: 1;
-}
-.page-header {
-  margin-bottom: 40px;
-  padding-bottom: 32px;
-  border-bottom: 1px solid var(--line);
-}
-.page-eyebrow {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
-  text-transform: uppercase; color: var(--sage);
-  margin-bottom: 10px;
-  display: flex; align-items: center; gap: 8px;
-}
-.page-eyebrow::before {
-  content: ''; display: block;
-  width: 20px; height: 1.5px; background: var(--sage);
-}
-.page-title {
-  font-family: 'Instrument Serif', serif;
-  font-size: clamp(28px, 4vw, 40px);
-  font-weight: 400; color: var(--ink);
-  letter-spacing: -0.03em; line-height: 1.15;
-  margin-bottom: 10px;
-}
+body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; }
+
+/* ── AUTH SCREEN ── */
+.auth-screen { display: none; position: fixed; inset: 0; background: var(--paper); z-index: 200; align-items: center; justify-content: center; padding: 24px; }
+.auth-screen.show { display: flex; }
+.auth-card { background: white; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 40px; width: 100%; max-width: 400px; box-shadow: var(--shadow-lg); }
+.auth-wordmark { font-family: 'Instrument Serif', serif; font-size: 26px; color: var(--sage-dark); letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.auth-wordmark-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sage); display: inline-block; }
+.auth-subtitle { font-size: 13px; color: var(--ink-muted); margin-bottom: 32px; }
+.auth-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); display: block; margin-bottom: 6px; }
+.auth-input { font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); background: var(--paper); border: 1.5px solid var(--line); border-radius: var(--r); padding: 10px 14px; width: 100%; outline: none; margin-bottom: 16px; -webkit-appearance: none; }
+.auth-input:focus { border-color: var(--sage); background: white; box-shadow: 0 0 0 3px rgba(74,107,90,0.1); }
+.auth-btn { width: 100%; padding: 13px; background: var(--sage); color: white; border: none; border-radius: var(--r); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 4px; }
+.auth-btn:hover { background: var(--sage-dark); }
+.auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.auth-error { font-size: 12px; color: var(--rose); margin-top: 8px; display: none; }
+.auth-error.show { display: block; }
+.auth-toggle { font-size: 13px; color: var(--ink-muted); text-align: center; margin-top: 20px; }
+.auth-toggle a { color: var(--sage); cursor: pointer; text-decoration: underline; }
+.auth-magic-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
+.auth-magic-divider::before, .auth-magic-divider::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.auth-magic-divider span { font-size: 11px; color: var(--ink-muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+.auth-magic-btn { width: 100%; padding: 11px; background: var(--paper-warm); color: var(--ink-soft); border: 1.5px solid var(--line); border-radius: var(--r); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.auth-magic-btn:hover { background: var(--paper-mid); }
+.auth-success-msg { background: var(--sage-light); border: 1px solid var(--sage); border-radius: var(--r); padding: 14px 16px; font-size: 13px; color: var(--sage-dark); display: none; margin-top: 16px; line-height: 1.5; }
+.auth-success-msg.show { display: block; }
+
+/* ── TOPBAR ── */
+.topbar { position: sticky; top: 0; z-index: 100; background: rgba(253,250,246,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--line); padding: 0 32px; }
+.topbar-inner { max-width: 860px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+.wordmark { font-family: 'Instrument Serif', serif; font-size: 22px; color: var(--sage-dark); letter-spacing: -0.02em; display: flex; align-items: center; gap: 8px; }
+.wordmark-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--sage); display: inline-block; margin-bottom: 2px; }
+.topbar-right { display: flex; align-items: center; gap: 16px; }
+.topbar-user { font-size: 12px; color: var(--ink-muted); }
+.signout-btn { font-size: 12px; color: var(--ink-muted); background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 6px; font-family: 'DM Sans', sans-serif; }
+.signout-btn:hover { background: var(--paper-mid); color: var(--ink); }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: white; padding: 12px 20px; border-radius: 10px; font-size: 13px; font-weight: 500; opacity: 0; pointer-events: none; transition: all 0.3s; z-index: 300; white-space: nowrap; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.error { background: var(--rose); }
+
+/* ── MAIN ── */
+.main { max-width: 860px; margin: 0 auto; padding: 48px 32px 80px; position: relative; z-index: 1; }
+.page-header { margin-bottom: 40px; padding-bottom: 32px; border-bottom: 1px solid var(--line); }
+.page-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sage); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.page-eyebrow::before { content: ''; display: block; width: 20px; height: 1.5px; background: var(--sage); }
+.page-title { font-family: 'Instrument Serif', serif; font-size: clamp(28px, 4vw, 40px); font-weight: 400; color: var(--ink); letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 10px; }
 .page-title em { font-style: italic; color: var(--sage-dark); }
-.page-sub {
-  font-size: 14px; color: var(--ink-muted); line-height: 1.7;
-  max-width: 560px;
-}
-.steps {
-  display: flex; gap: 0; margin-bottom: 36px;
-  border: 1px solid var(--line); border-radius: var(--r-lg);
-  overflow: hidden; background: var(--paper-warm);
-}
-.step {
-  flex: 1; padding: 14px 16px;
-  display: flex; align-items: center; gap: 10px;
-  border-right: 1px solid var(--line);
-  cursor: pointer; transition: background 0.2s;
-}
+.page-sub { font-size: 14px; color: var(--ink-muted); line-height: 1.7; max-width: 560px; }
+
+/* ── STEPS ── */
+.steps { display: flex; margin-bottom: 36px; border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; background: var(--paper-warm); }
+.step { flex: 1; padding: 14px 16px; display: flex; align-items: center; gap: 10px; border-right: 1px solid var(--line); cursor: pointer; transition: background 0.2s; }
 .step:last-child { border-right: none; }
 .step.active { background: var(--sage); }
 .step.done { background: var(--sage-light); }
 .step.done:hover { background: #ddeadd; }
-.step-num {
-  width: 24px; height: 24px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; flex-shrink: 0;
-  background: var(--line); color: var(--ink-muted);
-  transition: all 0.2s;
-}
+.step-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; background: var(--line); color: var(--ink-muted); transition: all 0.2s; }
 .step.active .step-num { background: white; color: var(--sage-dark); }
 .step.done .step-num { background: var(--sage); color: white; font-size: 13px; }
-.step-label {
-  font-size: 12px; font-weight: 600; color: var(--ink-muted);
-  text-transform: uppercase; letter-spacing: 0.05em;
-}
+.step-label { font-size: 12px; font-weight: 600; color: var(--ink-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 .step.active .step-label { color: white; }
 .step.done .step-label { color: var(--sage-dark); }
+
+/* ── PANELS ── */
 .panel { display: none; }
 .panel.active { display: block; animation: slideIn 0.3s ease; }
-@keyframes slideIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.section {
-  background: white; border: 1px solid var(--line);
-  border-radius: var(--r-lg); margin-bottom: 20px;
-  overflow: hidden; box-shadow: var(--shadow-sm);
-}
-.section-head {
-  padding: 18px 24px; background: var(--paper-warm);
-  border-bottom: 1px solid var(--line);
-  display: flex; align-items: center; gap: 12px;
-}
-.section-icon {
-  width: 32px; height: 32px; border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 15px; flex-shrink: 0;
-}
-.section-head h2 {
-  font-family: 'Instrument Serif', serif;
-  font-size: 17px; font-weight: 400;
-  color: var(--ink); letter-spacing: -0.01em;
-}
+@keyframes slideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── SECTIONS ── */
+.section { background: white; border: 1px solid var(--line); border-radius: var(--r-lg); margin-bottom: 20px; overflow: hidden; box-shadow: var(--shadow-sm); }
+.section-head { padding: 18px 24px; background: var(--paper-warm); border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 12px; }
+.section-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+.section-head h2 { font-family: 'Instrument Serif', serif; font-size: 17px; font-weight: 400; color: var(--ink); letter-spacing: -0.01em; }
 .section-head p { font-size: 12px; color: var(--ink-muted); margin-top: 1px; }
 .section-body { padding: 24px; }
+
+/* ── FORM ── */
 .grid { display: grid; gap: 16px; }
 .grid-2 { grid-template-columns: 1fr 1fr; }
 .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
 .span-2 { grid-column: span 2; }
 .field { display: flex; flex-direction: column; gap: 5px; }
-.field label {
-  font-size: 11px; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.08em;
-  color: var(--ink-soft);
-  display: flex; align-items: center; gap: 6px;
-}
-.required-dot {
-  width: 5px; height: 5px; border-radius: 50%;
-  background: var(--amber); display: inline-block;
-}
-.optional-tag {
-  font-size: 9px; color: var(--ink-muted);
-  background: var(--paper-mid); padding: 1px 6px;
-  border-radius: 4px; font-weight: 500;
-  text-transform: uppercase; letter-spacing: 0.06em;
-}
-input, select, textarea {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px; color: var(--ink);
-  background: var(--paper);
-  border: 1.5px solid var(--line);
-  border-radius: var(--r);
-  padding: 10px 14px;
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-  width: 100%; outline: none; -webkit-appearance: none;
-}
-input:focus, select:focus, textarea:focus {
-  border-color: var(--sage); background: white;
-  box-shadow: 0 0 0 3px rgba(74,107,90,0.1);
-}
+.field label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); display: flex; align-items: center; gap: 6px; }
+.required-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--amber); display: inline-block; }
+.optional-tag { font-size: 9px; color: var(--ink-muted); background: var(--paper-mid); padding: 1px 6px; border-radius: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; }
+input, select, textarea { font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); background: var(--paper); border: 1.5px solid var(--line); border-radius: var(--r); padding: 10px 14px; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s; width: 100%; outline: none; -webkit-appearance: none; }
+input:focus, select:focus, textarea:focus { border-color: var(--sage); background: white; box-shadow: 0 0 0 3px rgba(74,107,90,0.1); }
 input::placeholder, textarea::placeholder { color: var(--ink-muted); }
-select {
-  cursor: pointer;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A8480' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px;
-}
+select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238A8480' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
 textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
 input.error, select.error, textarea.error { border-color: var(--rose); background: var(--rose-light); }
 .field-error { font-size: 11px; color: var(--rose); font-weight: 500; display: none; }
 .field-error.show { display: block; }
-.goal-card {
-  border: 1.5px solid var(--line); border-radius: var(--r-lg);
-  overflow: hidden; margin-bottom: 16px; transition: border-color 0.2s;
-}
-.goal-card:hover { border-color: var(--sage); }
-.goal-card-head {
-  padding: 12px 16px; background: var(--sage-light);
-  border-bottom: 1px solid var(--line);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.goal-num {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--sage-dark);
-  display: flex; align-items: center; gap: 6px;
-}
-.goal-num-badge {
-  width: 20px; height: 20px; border-radius: 50%;
-  background: var(--sage); color: white;
-  font-size: 11px; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-}
-.remove-goal {
-  background: none; border: none; cursor: pointer;
-  font-size: 18px; color: var(--ink-muted);
-  line-height: 1; padding: 2px 6px; border-radius: 4px;
-  transition: all 0.15s;
-}
-.remove-goal:hover { background: var(--rose-light); color: var(--rose); }
-.goal-card-body { padding: 16px; }
-.benchmark-group {
-  background: var(--paper-warm); border: 1px solid var(--line);
-  border-radius: var(--r); padding: 14px 16px; margin-top: 12px;
-}
-.benchmark-group-label {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.1em;
-  text-transform: uppercase; color: var(--ink-muted);
-  margin-bottom: 10px;
-  display: flex; align-items: center; gap: 8px;
-}
-.benchmark-group-label::after { content: ''; flex: 1; height: 1px; background: var(--line); }
-.add-goal-btn {
-  width: 100%; padding: 14px;
-  border: 1.5px dashed var(--line); border-radius: var(--r-lg);
-  background: transparent; cursor: pointer;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 13px; font-weight: 600; color: var(--ink-muted);
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  transition: all 0.2s;
-}
-.add-goal-btn:hover { border-color: var(--sage); color: var(--sage); background: var(--sage-light); }
-.add-goal-btn span { font-size: 18px; line-height: 1; }
+.help { font-size: 12px; color: var(--ink-muted); margin-top: 4px; line-height: 1.5; }
+.divider { height: 1px; background: var(--line); margin: 20px 0; }
+.accuracy-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start; }
+.accuracy-suffix { padding: 10px 14px; font-size: 14px; color: var(--ink-muted); font-weight: 600; white-space: nowrap; background: var(--paper-mid); border: 1.5px solid var(--line); border-radius: var(--r); margin-top: 22px; }
+
+/* ── DOMAIN PILLS ── */
 .domain-pills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
-.domain-pill {
-  padding: 5px 12px; border-radius: 20px;
-  font-size: 12px; font-weight: 600;
-  border: 1.5px solid var(--line);
-  cursor: pointer; transition: all 0.15s;
-  background: var(--paper); color: var(--ink-soft); user-select: none;
-}
+.domain-pill { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; border: 1.5px solid var(--line); cursor: pointer; transition: all 0.15s; background: var(--paper); color: var(--ink-soft); user-select: none; }
 .domain-pill:hover { border-color: var(--sage); color: var(--sage); }
 .domain-pill.selected { background: var(--sage); color: white; border-color: var(--sage); }
 .domain-pill[data-domain="articulation"].selected { background: var(--blue); border-color: var(--blue); }
@@ -278,90 +132,64 @@ input.error, select.error, textarea.error { border-color: var(--rose); backgroun
 .domain-pill[data-domain="fluency"].selected { background: var(--rose); border-color: var(--rose); }
 .domain-pill[data-domain="voice"].selected { background: var(--gold); border-color: var(--gold); }
 .domain-pill[data-domain="aac"].selected { background: #5A4A7A; border-color: #5A4A7A; }
-.review-section {
-  background: white; border: 1px solid var(--line);
-  border-radius: var(--r-lg); overflow: hidden;
-  margin-bottom: 16px; box-shadow: var(--shadow-sm);
-}
-.review-section-head {
-  padding: 14px 20px; background: var(--paper-warm);
-  border-bottom: 1px solid var(--line);
-  font-size: 12px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft);
-  display: flex; align-items: center; gap: 8px;
-}
-.review-row {
-  display: flex; padding: 10px 20px;
-  border-bottom: 1px solid var(--line); gap: 16px; font-size: 13.5px;
-}
+
+/* ── GOALS ── */
+.goal-card { border: 1.5px solid var(--line); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 16px; transition: border-color 0.2s; }
+.goal-card:hover { border-color: var(--sage); }
+.goal-card-head { padding: 12px 16px; background: var(--sage-light); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+.goal-num { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--sage-dark); display: flex; align-items: center; gap: 6px; }
+.goal-num-badge { width: 20px; height: 20px; border-radius: 50%; background: var(--sage); color: white; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+.remove-goal { background: none; border: none; cursor: pointer; font-size: 18px; color: var(--ink-muted); line-height: 1; padding: 2px 6px; border-radius: 4px; transition: all 0.15s; }
+.remove-goal:hover { background: var(--rose-light); color: var(--rose); }
+.goal-card-body { padding: 16px; }
+.benchmark-group { background: var(--paper-warm); border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; margin-top: 12px; }
+.benchmark-group-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+.benchmark-group-label::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+.add-goal-btn { width: 100%; padding: 14px; border: 1.5px dashed var(--line); border-radius: var(--r-lg); background: transparent; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--ink-muted); display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; }
+.add-goal-btn:hover { border-color: var(--sage); color: var(--sage); background: var(--sage-light); }
+.add-goal-btn span { font-size: 18px; line-height: 1; }
+
+/* ── REVIEW ── */
+.review-section { background: white; border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+.review-section-head { padding: 14px 20px; background: var(--paper-warm); border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); display: flex; align-items: center; gap: 8px; }
+.review-row { display: flex; padding: 10px 20px; border-bottom: 1px solid var(--line); gap: 16px; font-size: 13.5px; }
 .review-row:last-child { border-bottom: none; }
 .review-label { width: 180px; flex-shrink: 0; color: var(--ink-muted); font-weight: 500; }
 .review-value { color: var(--ink); flex: 1; }
 .review-goal-card { margin: 0 20px 16px; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
-.review-goal-head {
-  padding: 10px 16px; background: var(--sage-light);
-  font-size: 12px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.06em; color: var(--sage-dark);
-  display: flex; align-items: center; gap: 6px;
-}
+.review-goal-head { padding: 10px 16px; background: var(--sage-light); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--sage-dark); display: flex; align-items: center; gap: 6px; }
 .review-goal-body { padding: 12px 16px; font-size: 13.5px; line-height: 1.7; }
-.review-goal-body strong {
-  color: var(--ink-muted); font-size: 11px; text-transform: uppercase;
-  letter-spacing: 0.06em; display: block; margin-top: 8px; margin-bottom: 2px;
-}
+.review-goal-body strong { color: var(--ink-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; display: block; margin-top: 8px; margin-bottom: 2px; }
 .review-goal-body strong:first-child { margin-top: 0; }
-.nav-row {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line);
-}
-.btn {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 14px; font-weight: 600;
-  padding: 12px 28px; border-radius: var(--r);
-  cursor: pointer; transition: all 0.2s;
-  border: none; display: flex; align-items: center; gap: 8px;
-}
+
+/* ── BUTTONS ── */
+.nav-row { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line); }
+.btn { font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; padding: 12px 28px; border-radius: var(--r); cursor: pointer; transition: all 0.2s; border: none; display: flex; align-items: center; gap: 8px; }
 .btn-primary { background: var(--sage); color: white; }
 .btn-primary:hover { background: var(--sage-dark); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
 .btn-secondary { background: var(--paper-warm); color: var(--ink-soft); border: 1.5px solid var(--line); }
 .btn-secondary:hover { background: var(--paper-mid); }
 .btn-success { background: var(--sage-dark); color: white; font-size: 15px; padding: 14px 36px; }
 .btn-success:hover { background: #223830; transform: translateY(-1px); box-shadow: var(--shadow-lg); }
-.success-screen { display: none; text-align: center; padding: 60px 32px; animation: slideIn 0.4s ease; }
-.success-screen.show { display: block; }
-.success-icon {
-  width: 72px; height: 72px; border-radius: 50%;
-  background: var(--sage); color: white; font-size: 32px;
-  margin: 0 auto 24px;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: var(--shadow-lg);
-}
-.success-title { font-family: 'Instrument Serif', serif; font-size: 32px; color: var(--ink); letter-spacing: -0.02em; margin-bottom: 10px; }
-.success-sub { font-size: 15px; color: var(--ink-muted); margin-bottom: 32px; }
-.success-card {
-  background: white; border: 1px solid var(--line);
-  border-radius: var(--r-lg); padding: 24px;
-  max-width: 400px; margin: 0 auto 28px;
-  box-shadow: var(--shadow-sm); text-align: left;
-}
-.success-student-name { font-family: 'Instrument Serif', serif; font-size: 22px; color: var(--ink); margin-bottom: 4px; }
-.success-student-meta { font-size: 13px; color: var(--ink-muted); }
-.success-goals-count {
-  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);
-  font-size: 13px; color: var(--sage-dark); font-weight: 600;
-  display: flex; align-items: center; gap: 6px;
-}
-.help { font-size: 12px; color: var(--ink-muted); margin-top: 4px; line-height: 1.5; }
-.accuracy-row { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start; }
-.accuracy-suffix {
-  padding: 10px 14px; font-size: 14px; color: var(--ink-muted); font-weight: 600;
-  white-space: nowrap; background: var(--paper-mid); border: 1.5px solid var(--line);
-  border-radius: var(--r); margin-top: 22px;
-}
-.divider { height: 1px; background: var(--line); margin: 20px 0; }
+.btn-success:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* ── BADGE ── */
 .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.06em; }
 .badge-sage { background: var(--sage-light); color: var(--sage-dark); }
 .badge-amber { background: var(--amber-light); color: var(--amber); }
+
+/* ── SUCCESS ── */
+.success-screen { display: none; text-align: center; padding: 60px 32px; animation: slideIn 0.4s ease; }
+.success-screen.show { display: block; }
+.success-icon { width: 72px; height: 72px; border-radius: 50%; background: var(--sage); color: white; font-size: 32px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg); }
+.success-title { font-family: 'Instrument Serif', serif; font-size: 32px; color: var(--ink); letter-spacing: -0.02em; margin-bottom: 10px; }
+.success-sub { font-size: 15px; color: var(--ink-muted); margin-bottom: 32px; }
+.success-card { background: white; border: 1px solid var(--line); border-radius: var(--r-lg); padding: 24px; max-width: 400px; margin: 0 auto 28px; box-shadow: var(--shadow-sm); text-align: left; }
+.success-student-name { font-family: 'Instrument Serif', serif; font-size: 22px; color: var(--ink); margin-bottom: 4px; }
+.success-student-meta { font-size: 13px; color: var(--ink-muted); }
+.success-goals-count { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--sage-dark); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+
 @media (max-width: 640px) {
   .main { padding: 32px 16px 60px; }
   .topbar { padding: 0 16px; }
@@ -377,91 +205,78 @@ input.error, select.error, textarea.error { border-color: var(--rose); backgroun
 </head>
 <body>
 
+<!-- ── AUTH SCREEN ── -->
+<div class="auth-screen show" id="authScreen">
+  <div class="auth-card">
+    <div class="auth-wordmark"><span class="auth-wordmark-dot"></span>Aria</div>
+    <div class="auth-subtitle">Sign in to your caseload</div>
+
+    <label class="auth-label">Email</label>
+    <input class="auth-input" type="email" id="authEmail" placeholder="you@school.edu" autocomplete="email">
+
+    <div id="authPasswordSection">
+      <label class="auth-label">Password</label>
+      <input class="auth-input" type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <button class="auth-btn" id="authBtn" onclick="handleAuth()">Sign In</button>
+    <div class="auth-error" id="authError"></div>
+
+    <div class="auth-magic-divider"><span>or</span></div>
+    <button class="auth-magic-btn" onclick="sendMagicLink()">✉️ Send magic link instead</button>
+    <div class="auth-success-msg" id="authMagicMsg">Check your email — a sign-in link is on its way. You can close this tab and click the link from any device.</div>
+
+    <div class="auth-toggle" id="authToggle">
+      Don't have an account? <a onclick="toggleAuthMode()">Create one</a>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<!-- ── TOPBAR ── -->
 <nav class="topbar">
   <div class="topbar-inner">
     <div class="wordmark"><span class="wordmark-dot"></span>Aria</div>
-    <div class="topbar-meta">Student Intake</div>
+    <div class="topbar-right">
+      <span class="topbar-user" id="topbarUser"></span>
+      <button class="signout-btn" onclick="signOut()">Sign out</button>
+    </div>
   </div>
 </nav>
 
+<!-- ── MAIN ── -->
 <main class="main">
   <div class="page-header">
     <div class="page-eyebrow">New Student</div>
     <h1 class="page-title">Add a student <em>to your caseload</em></h1>
-    <p class="page-sub">Fill in the student's core information and IEP goals. Required fields are marked with an amber dot. Optional fields help with reporting later.</p>
+    <p class="page-sub">Fill in the student's core information and IEP goals. Required fields are marked with an amber dot. Everything saves directly to your secure caseload.</p>
   </div>
 
   <div class="steps" id="steps">
-    <div class="step active" data-step="0" onclick="jumpTo(0)">
-      <div class="step-num">1</div>
-      <div><div class="step-label">Student Info</div></div>
-    </div>
-    <div class="step" data-step="1" onclick="jumpTo(1)">
-      <div class="step-num">2</div>
-      <div><div class="step-label">IEP Details</div></div>
-    </div>
-    <div class="step" data-step="2" onclick="jumpTo(2)">
-      <div class="step-num">3</div>
-      <div><div class="step-label">Goals</div></div>
-    </div>
-    <div class="step" data-step="3" onclick="jumpTo(3)">
-      <div class="step-num">4</div>
-      <div><div class="step-label">Review</div></div>
-    </div>
+    <div class="step active" data-step="0" onclick="jumpTo(0)"><div class="step-num">1</div><div><div class="step-label">Student Info</div></div></div>
+    <div class="step" data-step="1" onclick="jumpTo(1)"><div class="step-num">2</div><div><div class="step-label">IEP Details</div></div></div>
+    <div class="step" data-step="2" onclick="jumpTo(2)"><div class="step-num">3</div><div><div class="step-label">Goals</div></div></div>
+    <div class="step" data-step="3" onclick="jumpTo(3)"><div class="step-num">4</div><div><div class="step-label">Review</div></div></div>
   </div>
 
   <!-- PANEL 0 — STUDENT INFO -->
   <div class="panel active" id="panel-0">
     <div class="section">
-      <div class="section-head">
-        <div class="section-icon" style="background:var(--sage-light);">👤</div>
-        <div><h2>Basic Information</h2><p>Name, grade, and school placement</p></div>
-      </div>
+      <div class="section-head"><div class="section-icon" style="background:var(--sage-light);">👤</div><div><h2>Basic Information</h2><p>Name, grade, and school placement</p></div></div>
       <div class="section-body">
         <div class="grid grid-2">
-          <div class="field">
-            <label><span class="required-dot"></span> First Name</label>
-            <input type="text" id="firstName" placeholder="e.g. Madison" autocomplete="given-name">
-            <div class="field-error" id="err-firstName">First name is required</div>
-          </div>
-          <div class="field">
-            <label><span class="required-dot"></span> Last Initial</label>
-            <input type="text" id="lastName" placeholder="e.g. B" maxlength="3" style="text-transform:uppercase;" autocomplete="off">
-            <div class="field-error" id="err-lastName">Last initial is required</div>
-          </div>
-          <div class="field">
-            <label><span class="required-dot"></span> Grade</label>
-            <select id="grade">
-              <option value="">Select grade</option>
-              <option>Kindergarten</option>
-              <option>1st Grade</option>
-              <option>2nd Grade</option>
-              <option>3rd Grade</option>
-              <option>4th Grade</option>
-              <option>5th Grade</option>
-              <option>6th Grade</option>
-              <option>Pre-K</option>
-              <option>Early Intervention</option>
-            </select>
-            <div class="field-error" id="err-grade">Grade is required</div>
-          </div>
-          <div class="field">
-            <label>Date of Birth <span class="optional-tag">Optional</span></label>
-            <input type="date" id="dob">
-          </div>
-          <div class="field span-2">
-            <label>School Building <span class="optional-tag">Optional</span></label>
-            <input type="text" id="school" placeholder="e.g. Sage Hills Elementary">
-            <div class="help">Only needed if you work across multiple sites</div>
-          </div>
+          <div class="field"><label><span class="required-dot"></span> First Name</label><input type="text" id="firstName" placeholder="e.g. Madison" autocomplete="given-name"><div class="field-error" id="err-firstName">First name is required</div></div>
+          <div class="field"><label><span class="required-dot"></span> Last Initial</label><input type="text" id="lastName" placeholder="e.g. B" maxlength="3" style="text-transform:uppercase;" autocomplete="off"><div class="field-error" id="err-lastName">Last initial is required</div></div>
+          <div class="field"><label><span class="required-dot"></span> Grade</label><select id="grade"><option value="">Select grade</option><option>Kindergarten</option><option>1st Grade</option><option>2nd Grade</option><option>3rd Grade</option><option>4th Grade</option><option>5th Grade</option><option>6th Grade</option><option>Pre-K</option><option>Early Intervention</option></select><div class="field-error" id="err-grade">Grade is required</div></div>
+          <div class="field"><label>Date of Birth <span class="optional-tag">Optional</span></label><input type="date" id="dob"></div>
+          <div class="field span-2"><label>School Building <span class="optional-tag">Optional</span></label><input type="text" id="school" placeholder="e.g. Sage Hills Elementary"><div class="help">Only needed if you work across multiple sites</div></div>
         </div>
       </div>
     </div>
     <div class="section">
-      <div class="section-head">
-        <div class="section-icon" style="background:var(--blue-light);">🏫</div>
-        <div><h2>Primary SLP Domain</h2><p>Select the main area of focus for this student</p></div>
-      </div>
+      <div class="section-head"><div class="section-icon" style="background:var(--blue-light);">🏫</div><div><h2>Primary SLP Domain</h2><p>Select the main area of focus for this student</p></div></div>
       <div class="section-body">
         <div class="field">
           <label><span class="required-dot"></span> Primary Domain</label>
@@ -479,148 +294,64 @@ input.error, select.error, textarea.error { border-color: var(--rose); backgroun
         </div>
       </div>
     </div>
-    <div class="nav-row">
-      <div></div>
-      <button class="btn btn-primary" onclick="nextPanel(0)">IEP Details →</button>
-    </div>
+    <div class="nav-row"><div></div><button class="btn btn-primary" onclick="nextPanel(0)">IEP Details →</button></div>
   </div>
 
   <!-- PANEL 1 — IEP DETAILS -->
   <div class="panel" id="panel-1">
     <div class="section">
-      <div class="section-head">
-        <div class="section-icon" style="background:var(--amber-light);">📋</div>
-        <div><h2>IEP Dates &amp; Eligibility</h2><p>Service dates and eligibility category</p></div>
-      </div>
+      <div class="section-head"><div class="section-icon" style="background:var(--amber-light);">📋</div><div><h2>IEP Dates &amp; Eligibility</h2><p>Service dates and eligibility category</p></div></div>
       <div class="section-body">
         <div class="grid grid-2">
-          <div class="field">
-            <label><span class="required-dot"></span> Eligibility Category</label>
-            <select id="eligibility">
-              <option value="">Select eligibility</option>
-              <option>Autism (II.J.2)</option>
-              <option>Speech Language Impairment (II.J.12)</option>
-              <option>Other Health Impairment (OHI)</option>
-              <option>Intellectual Disability</option>
-              <option>Specific Learning Disability</option>
-              <option>Emotional Disturbance</option>
-              <option>Developmental Delay</option>
-              <option>Multiple Disabilities</option>
-              <option>Traumatic Brain Injury</option>
-              <option>Hearing Impairment</option>
-              <option>Other</option>
-            </select>
-            <div class="field-error" id="err-eligibility">Eligibility category is required</div>
-          </div>
-          <div class="field">
-            <label><span class="required-dot"></span> IEP Start Date</label>
-            <input type="date" id="iepStart">
-            <div class="field-error" id="err-iepStart">IEP start date is required</div>
-          </div>
-          <div class="field">
-            <label><span class="required-dot"></span> Annual Review Date</label>
-            <input type="date" id="iepReview">
-            <div class="field-error" id="err-iepReview">Annual review date is required</div>
-            <div class="help">This drives renewal alerts on your dashboard</div>
-          </div>
-          <div class="field">
-            <label>Next Progress Report Date <span class="optional-tag">Optional</span></label>
-            <input type="date" id="progressDate">
-          </div>
+          <div class="field"><label><span class="required-dot"></span> Eligibility Category</label><select id="eligibility"><option value="">Select eligibility</option><option>Autism (II.J.2)</option><option>Speech Language Impairment (II.J.12)</option><option>Other Health Impairment (OHI)</option><option>Intellectual Disability</option><option>Specific Learning Disability</option><option>Emotional Disturbance</option><option>Developmental Delay</option><option>Multiple Disabilities</option><option>Traumatic Brain Injury</option><option>Hearing Impairment</option><option>Other</option></select><div class="field-error" id="err-eligibility">Eligibility category is required</div></div>
+          <div class="field"><label><span class="required-dot"></span> IEP Start Date</label><input type="date" id="iepStart"><div class="field-error" id="err-iepStart">IEP start date is required</div></div>
+          <div class="field"><label><span class="required-dot"></span> Annual Review Date</label><input type="date" id="iepReview"><div class="field-error" id="err-iepReview">Annual review date is required</div><div class="help">This drives renewal alerts on your dashboard</div></div>
+          <div class="field"><label>Next Progress Report Date <span class="optional-tag">Optional</span></label><input type="date" id="progressDate"></div>
         </div>
       </div>
     </div>
     <div class="section">
-      <div class="section-head">
-        <div class="section-icon" style="background:var(--gold-light);">⏱</div>
-        <div><h2>Service Minutes</h2><p>Mandated service frequency for this student</p></div>
-      </div>
+      <div class="section-head"><div class="section-icon" style="background:var(--gold-light);">⏱</div><div><h2>Service Minutes</h2><p>Mandated service frequency for this student</p></div></div>
       <div class="section-body">
         <div class="grid grid-3">
-          <div class="field">
-            <label><span class="required-dot"></span> Minutes per Session</label>
-            <input type="number" id="sessionMins" placeholder="30" min="5" max="120" step="5">
-            <div class="field-error" id="err-sessionMins">Session minutes required</div>
-          </div>
-          <div class="field">
-            <label><span class="required-dot"></span> Sessions per Week</label>
-            <input type="number" id="sessionsPerWeek" placeholder="2" min="1" max="10" step="1">
-            <div class="field-error" id="err-sessionsPerWeek">Sessions per week required</div>
-          </div>
-          <div class="field">
-            <label>Delivery Model <span class="optional-tag">Optional</span></label>
-            <select id="deliveryModel">
-              <option value="">Select model</option>
-              <option>Pull-out only</option>
-              <option>Push-in only</option>
-              <option>Pull-out + Push-in</option>
-              <option>Consultation</option>
-              <option>Group</option>
-              <option>Individual</option>
-            </select>
-          </div>
+          <div class="field"><label><span class="required-dot"></span> Minutes per Session</label><input type="number" id="sessionMins" placeholder="30" min="5" max="120" step="5"><div class="field-error" id="err-sessionMins">Session minutes required</div></div>
+          <div class="field"><label><span class="required-dot"></span> Sessions per Week</label><input type="number" id="sessionsPerWeek" placeholder="2" min="1" max="10" step="1"><div class="field-error" id="err-sessionsPerWeek">Sessions per week required</div></div>
+          <div class="field"><label>Delivery Model <span class="optional-tag">Optional</span></label><select id="deliveryModel"><option value="">Select model</option><option>Pull-out only</option><option>Push-in only</option><option>Pull-out + Push-in</option><option>Consultation</option><option>Group</option><option>Individual</option></select></div>
         </div>
         <div class="divider"></div>
         <div class="grid grid-2">
-          <div class="field">
-            <label>Classroom Teacher <span class="optional-tag">Optional</span></label>
-            <input type="text" id="teacher" placeholder="e.g. Ms. Ruoho">
-          </div>
-          <div class="field">
-            <label>Other Providers <span class="optional-tag">Optional</span></label>
-            <input type="text" id="otherProviders" placeholder="e.g. BCBA, OT, School Psych">
-            <div class="help">Comma-separated.</div>
-          </div>
+          <div class="field"><label>Classroom Teacher <span class="optional-tag">Optional</span></label><input type="text" id="teacher" placeholder="e.g. Ms. Ruoho"></div>
+          <div class="field"><label>Other Providers <span class="optional-tag">Optional</span></label><input type="text" id="otherProviders" placeholder="e.g. BCBA, OT, School Psych"><div class="help">Comma-separated.</div></div>
         </div>
         <div class="divider"></div>
-        <div class="field">
-          <label>Context Notes <span class="optional-tag">Optional</span></label>
-          <textarea id="contextNotes" placeholder="Anything the AI should always know when drafting notes for this student. e.g. 'Has CAPD — uses FM system. BCBA on team. Note generalizations when observed.'" style="min-height:90px;"></textarea>
-          <div class="help">Included in every AI note prompt for this student. The more context, the better the notes.</div>
-        </div>
+        <div class="field"><label>Context Notes <span class="optional-tag">Optional</span></label><textarea id="contextNotes" placeholder="Anything the AI should always know when drafting notes for this student. e.g. 'Has CAPD — uses FM system. BCBA on team. Note generalizations when observed.'" style="min-height:90px;"></textarea><div class="help">Included in every AI note prompt for this student. The more context, the better the notes.</div></div>
       </div>
     </div>
-    <div class="nav-row">
-      <button class="btn btn-secondary" onclick="prevPanel(1)">← Back</button>
-      <button class="btn btn-primary" onclick="nextPanel(1)">Add Goals →</button>
-    </div>
+    <div class="nav-row"><button class="btn btn-secondary" onclick="prevPanel(1)">← Back</button><button class="btn btn-primary" onclick="nextPanel(1)">Add Goals →</button></div>
   </div>
 
   <!-- PANEL 2 — GOALS -->
   <div class="panel" id="panel-2">
     <div class="section">
-      <div class="section-head">
-        <div class="section-icon" style="background:var(--sage-light);">🎯</div>
-        <div><h2>IEP Goals</h2><p>Add 1–4 SLP goals. At least one is required. Benchmarks help the AI track progress.</p></div>
-      </div>
+      <div class="section-head"><div class="section-icon" style="background:var(--sage-light);">🎯</div><div><h2>IEP Goals</h2><p>Add 1–4 SLP goals. At least one is required. Benchmarks help the AI track progress.</p></div></div>
       <div class="section-body">
         <div id="goalsList"></div>
         <div class="field-error" id="err-goals" style="margin-bottom:12px;font-size:13px;">At least one goal is required</div>
-        <button class="add-goal-btn" onclick="addGoal()" id="addGoalBtn">
-          <span>+</span> Add SLP Goal
-        </button>
+        <button class="add-goal-btn" onclick="addGoal()" id="addGoalBtn"><span>+</span> Add SLP Goal</button>
       </div>
     </div>
-    <div class="nav-row">
-      <button class="btn btn-secondary" onclick="prevPanel(2)">← Back</button>
-      <button class="btn btn-primary" onclick="nextPanel(2)">Review →</button>
-    </div>
+    <div class="nav-row"><button class="btn btn-secondary" onclick="prevPanel(2)">← Back</button><button class="btn btn-primary" onclick="nextPanel(2)">Review →</button></div>
   </div>
 
   <!-- PANEL 3 — REVIEW -->
   <div class="panel" id="panel-3">
     <div class="section">
-      <div class="section-head">
-        <div class="section-icon" style="background:var(--paper-mid);">✓</div>
-        <div><h2>Review &amp; Confirm</h2><p>Double-check everything before saving to your caseload</p></div>
-      </div>
-      <div class="section-body" style="padding:0;">
-        <div id="reviewContent"></div>
-      </div>
+      <div class="section-head"><div class="section-icon" style="background:var(--paper-mid);">✓</div><div><h2>Review &amp; Confirm</h2><p>Double-check everything before saving to your caseload</p></div></div>
+      <div class="section-body" style="padding:0;"><div id="reviewContent"></div></div>
     </div>
     <div class="nav-row">
       <button class="btn btn-secondary" onclick="prevPanel(3)">← Edit</button>
-      <button class="btn btn-success" onclick="saveStudent()">✓ Save Student to Caseload</button>
+      <button class="btn btn-success" id="saveBtn" onclick="saveStudent()">✓ Save to Caseload</button>
     </div>
   </div>
 
@@ -628,16 +359,112 @@ input.error, select.error, textarea.error { border-color: var(--rose); backgroun
   <div class="success-screen" id="successScreen">
     <div class="success-icon">✓</div>
     <h2 class="success-title">Student added.</h2>
-    <p class="success-sub">They're now on your caseload and ready for session logging.</p>
+    <p class="success-sub">Saved securely to your caseload.</p>
     <div class="success-card" id="successCard"></div>
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
       <button class="btn btn-primary" onclick="addAnother()">+ Add Another Student</button>
-      <button class="btn btn-secondary" onclick="goToCaseload()">View Caseload →</button>
     </div>
   </div>
 </main>
 
 <script>
+// ── SUPABASE ──────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://gzpuectetjatqbpcdgqt.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd6cHVlY3RldGphdHFicGNkZ3F0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MTc3MTMsImV4cCI6MjA4ODI5MzcxM30.KkIr6SSqQtO3aGDtCCxUIBOgbEgjtVeqExlW_Yv-QZ0';
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+let authMode = 'signin'; // 'signin' | 'signup'
+
+// ── AUTH ──────────────────────────────────────────────────────────
+async function initAuth() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.user) {
+    onSignedIn(session.user);
+  } else {
+    document.getElementById('authScreen').classList.add('show');
+  }
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session?.user) onSignedIn(session.user);
+    if (event === 'SIGNED_OUT') onSignedOut();
+  });
+}
+
+function onSignedIn(user) {
+  currentUser = user;
+  document.getElementById('authScreen').classList.remove('show');
+  document.getElementById('topbarUser').textContent = user.email;
+}
+
+function onSignedOut() {
+  currentUser = null;
+  document.getElementById('authScreen').classList.add('show');
+  document.getElementById('topbarUser').textContent = '';
+}
+
+async function handleAuth() {
+  const email = document.getElementById('authEmail').value.trim();
+  const password = document.getElementById('authPassword').value;
+  const btn = document.getElementById('authBtn');
+  const errEl = document.getElementById('authError');
+  errEl.classList.remove('show');
+  if (!email || !password) { showAuthError('Email and password are required.'); return; }
+  btn.disabled = true;
+  btn.textContent = authMode === 'signin' ? 'Signing in…' : 'Creating account…';
+  const { error } = authMode === 'signin'
+    ? await supabase.auth.signInWithPassword({ email, password })
+    : await supabase.auth.signUp({ email, password });
+  btn.disabled = false;
+  btn.textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
+  if (error) { showAuthError(error.message); return; }
+  if (authMode === 'signup') {
+    showAuthError('Account created! Check your email to confirm, then sign in.');
+    document.getElementById('authError').style.color = 'var(--sage)';
+  }
+}
+
+async function sendMagicLink() {
+  const email = document.getElementById('authEmail').value.trim();
+  if (!email) { showAuthError('Enter your email address first.'); return; }
+  const { error } = await supabase.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
+  if (error) { showAuthError(error.message); return; }
+  document.getElementById('authMagicMsg').classList.add('show');
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('authError');
+  el.textContent = msg;
+  el.style.color = 'var(--rose)';
+  el.classList.add('show');
+}
+
+function toggleAuthMode() {
+  authMode = authMode === 'signin' ? 'signup' : 'signin';
+  document.getElementById('authBtn').textContent = authMode === 'signin' ? 'Sign In' : 'Create Account';
+  document.getElementById('authToggle').innerHTML = authMode === 'signin'
+    ? "Don't have an account? <a onclick='toggleAuthMode()'>Create one</a>"
+    : "Already have an account? <a onclick='toggleAuthMode()'>Sign in</a>";
+  document.getElementById('authError').classList.remove('show');
+}
+
+document.getElementById('authEmail').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('authPassword').focus(); });
+document.getElementById('authPassword').addEventListener('keydown', e => { if (e.key === 'Enter') handleAuth(); });
+
+async function signOut() {
+  await supabase.auth.signOut();
+  showToast('Signed out');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── FORM STATE ────────────────────────────────────────────────────
 let currentPanel = 0;
 let goals = [];
 let goalCount = 0;
@@ -652,9 +479,7 @@ function selectDomain(el) {
   document.getElementById('err-primaryDomain').classList.remove('show');
 }
 
-function jumpTo(idx) {
-  if (idx <= currentPanel || completedPanels.has(idx)) showPanel(idx);
-}
+function jumpTo(idx) { if (idx <= currentPanel || completedPanels.has(idx)) showPanel(idx); }
 
 function showPanel(idx) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -680,58 +505,33 @@ function prevPanel(from) { showPanel(from - 1); }
 function validatePanel(idx) {
   let ok = true;
   const required = {
-    0: [
-      { id: 'firstName', err: 'err-firstName' },
-      { id: 'lastName', err: 'err-lastName' },
-      { id: 'grade', err: 'err-grade' },
-      { id: 'primaryDomain', err: 'err-primaryDomain' },
-    ],
-    1: [
-      { id: 'eligibility', err: 'err-eligibility' },
-      { id: 'iepStart', err: 'err-iepStart' },
-      { id: 'iepReview', err: 'err-iepReview' },
-      { id: 'sessionMins', err: 'err-sessionMins' },
-      { id: 'sessionsPerWeek', err: 'err-sessionsPerWeek' },
-    ],
+    0: [{ id:'firstName', err:'err-firstName' }, { id:'lastName', err:'err-lastName' }, { id:'grade', err:'err-grade' }, { id:'primaryDomain', err:'err-primaryDomain' }],
+    1: [{ id:'eligibility', err:'err-eligibility' }, { id:'iepStart', err:'err-iepStart' }, { id:'iepReview', err:'err-iepReview' }, { id:'sessionMins', err:'err-sessionMins' }, { id:'sessionsPerWeek', err:'err-sessionsPerWeek' }],
     2: [], 3: [],
   };
   document.querySelectorAll('.field-error').forEach(e => e.classList.remove('show'));
   document.querySelectorAll('input, select, textarea').forEach(e => e.classList.remove('error'));
   (required[idx] || []).forEach(({ id, err }) => {
     const el = document.getElementById(id);
-    if (!el || !el.value.trim()) {
-      ok = false;
-      if (el) el.classList.add('error');
-      const errEl = document.getElementById(err);
-      if (errEl) errEl.classList.add('show');
-    }
+    if (!el || !el.value.trim()) { ok = false; if (el) el.classList.add('error'); const e = document.getElementById(err); if (e) e.classList.add('show'); }
   });
   if (idx === 2) {
-    if (goals.length === 0) {
-      ok = false;
-      document.getElementById('err-goals').classList.add('show');
-    }
-    goals.forEach(g => {
-      const el = document.getElementById('goal-text-' + g.id);
-      if (!el || !el.value.trim()) { ok = false; if (el) el.classList.add('error'); }
-    });
+    if (!goals.length) { ok = false; document.getElementById('err-goals').classList.add('show'); }
+    goals.forEach(g => { const el = document.getElementById('goal-text-' + g.id); if (!el || !el.value.trim()) { ok = false; if (el) el.classList.add('error'); } });
   }
   return ok;
 }
 
 function addGoal() {
   if (goals.length >= 4) return;
-  goalCount++;
-  const id = goalCount;
-  goals.push({ id });
-  renderGoals();
+  goalCount++; const id = goalCount;
+  goals.push({ id }); renderGoals();
   if (goals.length >= 4) document.getElementById('addGoalBtn').style.display = 'none';
   setTimeout(() => { const el = document.getElementById('goal-text-' + id); if (el) el.focus(); }, 100);
 }
 
 function removeGoal(id) {
-  goals = goals.filter(g => g.id !== id);
-  renderGoals();
+  goals = goals.filter(g => g.id !== id); renderGoals();
   if (goals.length < 4) document.getElementById('addGoalBtn').style.display = 'flex';
   document.getElementById('err-goals').classList.remove('show');
 }
@@ -743,73 +543,31 @@ function renderGoals() {
     <div class="goal-card" id="goal-card-${g.id}">
       <div class="goal-card-head">
         <div class="goal-num"><div class="goal-num-badge">${i+1}</div>Goal ${i+1}</div>
-        <button class="remove-goal" onclick="removeGoal(${g.id})" title="Remove">&times;</button>
+        <button class="remove-goal" onclick="removeGoal(${g.id})">&times;</button>
       </div>
       <div class="goal-card-body">
         <div class="grid">
-          <div class="field">
-            <label><span class="required-dot"></span> Goal Statement</label>
-            <textarea id="goal-text-${g.id}" placeholder="By the next annual IEP review, given a real or hypothetical peer conflict, [student] will..." style="min-height:100px;"></textarea>
-          </div>
+          <div class="field"><label><span class="required-dot"></span> Goal Statement</label><textarea id="goal-text-${g.id}" placeholder="By the next annual IEP review, given a real or hypothetical peer conflict, [student] will..." style="min-height:100px;"></textarea></div>
           <div class="grid grid-2">
-            <div class="field">
-              <label>Domain</label>
-              <select id="goal-domain-${g.id}">
-                <option value="">Select domain</option>
-                <option>Articulation</option><option>Language</option>
-                <option>Pragmatics / Social</option><option>Fluency</option>
-                <option>Voice</option><option>AAC</option><option>Mixed</option>
-              </select>
-            </div>
-            <div class="field">
-              <label>Accuracy Target <span class="optional-tag">Optional</span></label>
-              <div class="accuracy-row">
-                <input type="number" id="goal-accuracy-${g.id}" placeholder="80" min="0" max="100" step="5">
-                <div class="accuracy-suffix">%</div>
-              </div>
-            </div>
+            <div class="field"><label>Domain</label><select id="goal-domain-${g.id}"><option value="">Select domain</option><option>Articulation</option><option>Language</option><option>Pragmatics / Social</option><option>Fluency</option><option>Voice</option><option>AAC</option><option>Mixed</option></select></div>
+            <div class="field"><label>Accuracy Target <span class="optional-tag">Optional</span></label><div class="accuracy-row"><input type="number" id="goal-accuracy-${g.id}" placeholder="80" min="0" max="100" step="5"><div class="accuracy-suffix">%</div></div></div>
           </div>
-          <div class="field">
-            <label>Baseline Score + Source <span class="optional-tag">Optional</span></label>
-            <input type="text" id="goal-baseline-${g.id}" placeholder="e.g. 0% — IEE clinical observation, Feb 2026">
-            <div class="help">Pulled into progress reports and AI note context</div>
-          </div>
+          <div class="field"><label>Baseline Score + Source <span class="optional-tag">Optional</span></label><input type="text" id="goal-baseline-${g.id}" placeholder="e.g. 0% — IEE clinical observation, Feb 2026"><div class="help">Pulled into progress reports and AI note context</div></div>
         </div>
         <div class="benchmark-group">
           <div class="benchmark-group-label">Short-Term Benchmarks</div>
           <div class="grid">
-            <div class="field">
-              <label>Benchmark 1 <span class="optional-tag">~3 months</span></label>
-              <textarea id="goal-b1-${g.id}" placeholder="Given a structured, adult-facilitated scenario, student will..." style="min-height:70px;"></textarea>
-            </div>
-            <div class="field">
-              <label>Benchmark 2 <span class="optional-tag">~6 months</span></label>
-              <textarea id="goal-b2-${g.id}" placeholder="Given a small group or role-played peer scenario, student will..." style="min-height:70px;"></textarea>
-            </div>
-            <div class="field">
-              <label>Benchmark 3 <span class="optional-tag">~9 months</span></label>
-              <textarea id="goal-b3-${g.id}" placeholder="During naturalistic peer interactions with SLP coaching, student will..." style="min-height:70px;"></textarea>
-            </div>
+            <div class="field"><label>Benchmark 1 <span class="optional-tag">~3 months</span></label><textarea id="goal-b1-${g.id}" placeholder="Given a structured, adult-facilitated scenario, student will..." style="min-height:70px;"></textarea></div>
+            <div class="field"><label>Benchmark 2 <span class="optional-tag">~6 months</span></label><textarea id="goal-b2-${g.id}" placeholder="Given a small group or role-played peer scenario, student will..." style="min-height:70px;"></textarea></div>
+            <div class="field"><label>Benchmark 3 <span class="optional-tag">~9 months</span></label><textarea id="goal-b3-${g.id}" placeholder="During naturalistic peer interactions with SLP coaching, student will..." style="min-height:70px;"></textarea></div>
           </div>
         </div>
         <div class="grid grid-2" style="margin-top:12px;">
-          <div class="field">
-            <label>Active Benchmark <span class="optional-tag">Optional</span></label>
-            <select id="goal-active-benchmark-${g.id}">
-              <option value="1">Benchmark 1 (current)</option>
-              <option value="2">Benchmark 2</option>
-              <option value="3">Benchmark 3</option>
-              <option value="annual">Annual goal</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Goal Start Date <span class="optional-tag">Optional</span></label>
-            <input type="date" id="goal-start-${g.id}">
-          </div>
+          <div class="field"><label>Active Benchmark <span class="optional-tag">Optional</span></label><select id="goal-active-benchmark-${g.id}"><option value="1">Benchmark 1 (current)</option><option value="2">Benchmark 2</option><option value="3">Benchmark 3</option><option value="annual">Annual goal</option></select></div>
+          <div class="field"><label>Goal Start Date <span class="optional-tag">Optional</span></label><input type="date" id="goal-start-${g.id}"></div>
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 }
 
 function buildReview() {
@@ -822,81 +580,86 @@ function buildReview() {
     delivery: get('deliveryModel') || '—', teacher: get('teacher') || '—',
     otherProviders: get('otherProviders') || '—', contextNotes: get('contextNotes') || '—',
   };
-  const goalData = goals.map(g => ({
-    text: get('goal-text-' + g.id), domain: get('goal-domain-' + g.id),
-    accuracy: get('goal-accuracy-' + g.id), baseline: get('goal-baseline-' + g.id),
-    b1: get('goal-b1-' + g.id), b2: get('goal-b2-' + g.id), b3: get('goal-b3-' + g.id),
-    activeBenchmark: get('goal-active-benchmark-' + g.id),
-  }));
-  const fmt = d => (d && d !== '—') ? new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
-  const goalsHtml = goalData.map((g, i) => `
-    <div class="review-goal-card" style="margin:0 20px ${i===goalData.length-1?'20px':'12px'};">
-      <div class="review-goal-head"><div class="goal-num-badge">${i+1}</div>Goal ${i+1}${g.domain ? ' — '+g.domain : ''}</div>
-      <div class="review-goal-body">
-        <strong>Goal Statement</strong>${g.text||'—'}
-        ${g.accuracy!=='—'?'<strong>Accuracy Target</strong>'+g.accuracy+'%':''}
-        ${g.baseline!=='—'?'<strong>Baseline</strong>'+g.baseline:''}
-        ${g.b1!=='—'?'<strong>Benchmark 1</strong>'+g.b1:''}
-        ${g.b2!=='—'?'<strong>Benchmark 2</strong>'+g.b2:''}
-        ${g.b3!=='—'?'<strong>Benchmark 3</strong>'+g.b3:''}
-        <strong>Active Benchmark</strong>${g.activeBenchmark}
-      </div>
-    </div>`).join('');
+  const goalData = goals.map(g => ({ text: get('goal-text-'+g.id), domain: get('goal-domain-'+g.id), accuracy: get('goal-accuracy-'+g.id), baseline: get('goal-baseline-'+g.id), b1: get('goal-b1-'+g.id), b2: get('goal-b2-'+g.id), b3: get('goal-b3-'+g.id), activeBenchmark: get('goal-active-benchmark-'+g.id) }));
+  const fmt = d => (d && d !== '—') ? new Date(d+'T00:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+  const goalsHtml = goalData.map((g, i) => `<div class="review-goal-card" style="margin:0 20px ${i===goalData.length-1?'20px':'12px'};"><div class="review-goal-head"><div class="goal-num-badge">${i+1}</div>Goal ${i+1}${g.domain?` — ${g.domain}`:''}</div><div class="review-goal-body"><strong>Goal Statement</strong>${g.text||'—'}${g.accuracy!=='—'?`<strong>Accuracy Target</strong>${g.accuracy}%`:''}${g.baseline!=='—'?`<strong>Baseline</strong>${g.baseline}`:''}${g.b1!=='—'?`<strong>Benchmark 1</strong>${g.b1}`:''}${g.b2!=='—'?`<strong>Benchmark 2</strong>${g.b2}`:''}${g.b3!=='—'?`<strong>Benchmark 3</strong>${g.b3}`:''}<strong>Active Benchmark</strong>${g.activeBenchmark}</div></div>`).join('');
   document.getElementById('reviewContent').innerHTML = `
-    <div class="review-section">
-      <div class="review-section-head">👤 Student</div>
-      <div class="review-row"><div class="review-label">Name</div><div class="review-value"><strong>${s.name}</strong></div></div>
-      <div class="review-row"><div class="review-label">Grade</div><div class="review-value">${s.grade}</div></div>
-      <div class="review-row"><div class="review-label">School</div><div class="review-value">${s.school}</div></div>
-      <div class="review-row"><div class="review-label">Primary Domain</div><div class="review-value"><span class="badge badge-sage">${s.domain}</span></div></div>
-    </div>
-    <div class="review-section">
-      <div class="review-section-head">📋 IEP</div>
-      <div class="review-row"><div class="review-label">Eligibility</div><div class="review-value">${s.eligibility}</div></div>
-      <div class="review-row"><div class="review-label">IEP Start</div><div class="review-value">${fmt(s.iepStart)}</div></div>
-      <div class="review-row"><div class="review-label">Annual Review</div><div class="review-value"><span class="badge badge-amber">${fmt(s.iepReview)}</span></div></div>
-      <div class="review-row"><div class="review-label">Service</div><div class="review-value">${s.sessionMins} min × ${s.sessionsPerWeek}x/week — ${s.delivery}</div></div>
-      <div class="review-row"><div class="review-label">Teacher</div><div class="review-value">${s.teacher}</div></div>
-      <div class="review-row"><div class="review-label">Other Providers</div><div class="review-value">${s.otherProviders}</div></div>
-    </div>
+    <div class="review-section"><div class="review-section-head">👤 Student</div><div class="review-row"><div class="review-label">Name</div><div class="review-value"><strong>${s.name}</strong></div></div><div class="review-row"><div class="review-label">Grade</div><div class="review-value">${s.grade}</div></div><div class="review-row"><div class="review-label">School</div><div class="review-value">${s.school}</div></div><div class="review-row"><div class="review-label">Primary Domain</div><div class="review-value"><span class="badge badge-sage">${s.domain}</span></div></div></div>
+    <div class="review-section"><div class="review-section-head">📋 IEP</div><div class="review-row"><div class="review-label">Eligibility</div><div class="review-value">${s.eligibility}</div></div><div class="review-row"><div class="review-label">IEP Start</div><div class="review-value">${fmt(s.iepStart)}</div></div><div class="review-row"><div class="review-label">Annual Review</div><div class="review-value"><span class="badge badge-amber">${fmt(s.iepReview)}</span></div></div><div class="review-row"><div class="review-label">Service</div><div class="review-value">${s.sessionMins} min × ${s.sessionsPerWeek}x/week — ${s.delivery}</div></div><div class="review-row"><div class="review-label">Teacher</div><div class="review-value">${s.teacher}</div></div><div class="review-row"><div class="review-label">Other Providers</div><div class="review-value">${s.otherProviders}</div></div></div>
     ${s.contextNotes!=='—'?`<div class="review-section"><div class="review-section-head">💡 AI Context Notes</div><div class="review-row"><div class="review-value" style="color:var(--ink-soft);font-style:italic;">${s.contextNotes}</div></div></div>`:''}
-    <div class="review-section" style="margin-bottom:0;">
-      <div class="review-section-head">🎯 Goals (${goalData.length})</div>
-      ${goalsHtml}
-    </div>`;
+    <div class="review-section" style="margin-bottom:0;"><div class="review-section-head">🎯 Goals (${goalData.length})</div>${goalsHtml}</div>`;
 }
 
-function saveStudent() {
+// ── SAVE TO SUPABASE ──────────────────────────────────────────────
+async function saveStudent() {
+  if (!currentUser) { showToast('Not signed in', true); return; }
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true; btn.textContent = 'Saving…';
   const get = id => document.getElementById(id)?.value || '';
-  const studentData = {
-    id: Date.now(), createdAt: new Date().toISOString(),
-    firstName: get('firstName'), lastInitial: get('lastName').toUpperCase().trim(),
-    grade: get('grade'), dob: get('dob'), school: get('school'),
-    primaryDomain: selectedDomain, eligibility: get('eligibility'),
-    iepStart: get('iepStart'), iepReview: get('iepReview'), progressDate: get('progressDate'),
-    sessionMins: parseInt(get('sessionMins')) || 0, sessionsPerWeek: parseInt(get('sessionsPerWeek')) || 0,
-    deliveryModel: get('deliveryModel'), teacher: get('teacher'),
-    otherProviders: get('otherProviders'), contextNotes: get('contextNotes'),
-    goals: goals.map((g, i) => ({
-      id: g.id, order: i+1, text: get('goal-text-'+g.id), domain: get('goal-domain-'+g.id),
-      accuracyTarget: parseInt(get('goal-accuracy-'+g.id)) || null,
-      baseline: get('goal-baseline-'+g.id),
-      benchmark1: get('goal-b1-'+g.id), benchmark2: get('goal-b2-'+g.id), benchmark3: get('goal-b3-'+g.id),
-      activeBenchmark: get('goal-active-benchmark-'+g.id), startDate: get('goal-start-'+g.id),
-    }))
-  };
-  const existing = JSON.parse(localStorage.getItem('aria_students') || '[]');
-  existing.push(studentData);
-  localStorage.setItem('aria_students', JSON.stringify(existing));
-  document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
-  document.getElementById('steps').style.display = 'none';
-  document.getElementById('successScreen').classList.add('show');
-  document.getElementById('successCard').innerHTML = `
-    <div class="success-student-name">${studentData.firstName} ${studentData.lastInitial}.</div>
-    <div class="success-student-meta">${studentData.grade} · ${studentData.eligibility}</div>
-    <div class="success-student-meta" style="margin-top:2px;">IEP Review: ${new Date(studentData.iepReview+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
-    <div class="success-goals-count">🎯 ${studentData.goals.length} goal${studentData.goals.length!==1?'s':''} saved</div>`;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  try {
+    // 1. Insert student
+    const { data: student, error: studentError } = await supabase.from('students').insert({
+      user_id: currentUser.id,
+      first_name: get('firstName'),
+      last_initial: get('lastName').toUpperCase().trim(),
+      grade: get('grade'),
+      dob: get('dob') || null,
+      school: get('school') || null,
+      primary_domain: selectedDomain,
+      eligibility: get('eligibility'),
+      iep_start_date: get('iepStart'),
+      iep_review_date: get('iepReview'),
+      progress_report_date: get('progressDate') || null,
+      session_minutes: parseInt(get('sessionMins')) || 30,
+      sessions_per_week: parseInt(get('sessionsPerWeek')) || 2,
+      delivery_model: get('deliveryModel') || null,
+      classroom_teacher: get('teacher') || null,
+      other_providers: get('otherProviders') || null,
+      context_notes: get('contextNotes') || null,
+    }).select().single();
+    if (studentError) throw studentError;
+
+    // 2. Insert goals
+    if (goals.length > 0) {
+      const goalInserts = goals.map((g, i) => ({
+        student_id: student.id,
+        user_id: currentUser.id,
+        goal_order: i + 1,
+        goal_text: get('goal-text-' + g.id),
+        domain: get('goal-domain-' + g.id) || null,
+        accuracy_target: parseInt(get('goal-accuracy-' + g.id)) || null,
+        baseline_score: get('goal-baseline-' + g.id) || null,
+        benchmark_1: get('goal-b1-' + g.id) || null,
+        benchmark_2: get('goal-b2-' + g.id) || null,
+        benchmark_3: get('goal-b3-' + g.id) || null,
+        active_benchmark: get('goal-active-benchmark-' + g.id) || '1',
+        goal_start_date: get('goal-start-' + g.id) || null,
+      }));
+      const { error: goalsError } = await supabase.from('goals').insert(goalInserts);
+      if (goalsError) throw goalsError;
+    }
+
+    // 3. Show success
+    const firstName = get('firstName');
+    const lastInitial = get('lastName').toUpperCase().trim();
+    const grade = get('grade');
+    const eligibility = get('eligibility');
+    const iepReview = get('iepReview');
+    document.querySelectorAll('.panel').forEach(p => p.style.display = 'none');
+    document.getElementById('steps').style.display = 'none';
+    document.getElementById('successScreen').classList.add('show');
+    document.getElementById('successCard').innerHTML = `
+      <div class="success-student-name">${firstName} ${lastInitial}.</div>
+      <div class="success-student-meta">${grade} · ${eligibility}</div>
+      <div class="success-student-meta" style="margin-top:2px;">IEP Review: ${new Date(iepReview+'T00:00:00').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
+      <div class="success-goals-count">🎯 ${goals.length} goal${goals.length!==1?'s':''} saved</div>`;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showToast('Saved to Supabase ✓');
+  } catch (err) {
+    console.error(err);
+    showToast('Save failed: ' + err.message, true);
+    btn.disabled = false; btn.textContent = '✓ Save to Caseload';
+  }
 }
 
 function addAnother() {
@@ -908,18 +671,16 @@ function addAnother() {
   document.querySelectorAll('.domain-pill').forEach(p => p.classList.remove('selected'));
   selectedDomain = ''; goals = []; goalCount = 0; completedPanels.clear();
   renderGoals(); document.getElementById('addGoalBtn').style.display = 'flex';
-  document.querySelectorAll('.step').forEach((s, i) => {
-    s.classList.remove('active','done'); if (i===0) s.classList.add('active');
-  });
+  document.getElementById('saveBtn').disabled = false; document.getElementById('saveBtn').textContent = '✓ Save to Caseload';
+  document.querySelectorAll('.step').forEach((s, i) => { s.classList.remove('active','done'); if (i===0) s.classList.add('active'); });
   currentPanel = 0; window.scrollTo({ top:0, behavior:'smooth' });
 }
 
-function goToCaseload() {
-  const students = JSON.parse(localStorage.getItem('aria_students') || '[]');
-  alert('✓ ' + students.length + ' student' + (students.length!==1?'s':'') + ' on your caseload.\n\nThe full caseload view is coming in the next build. Your data is saved locally — when Supabase is connected, everything transfers automatically.');
-}
-
-document.addEventListener('DOMContentLoaded', () => { renderGoals(); });
+// ── INIT ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderGoals();
+  initAuth();
+});
 </script>
 </body>
 </html>
